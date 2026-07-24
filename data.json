@@ -9,7 +9,7 @@
       "address": "105403 台北市松山區民生東路三段138號10樓",
       "taxId": "42670234"
     },
-    "lastUpdated": "2026-07-21T08:58:12+08:00"
+    "lastUpdated": "2026-07-24T10:20:44+08:00"
   },
   "bulletins": [
     {
@@ -28,9 +28,12 @@
           "items": [
             {
               "id": "w29-item-001",
-              "content": "因目前全台庫存週轉天數偏高，為有效控管庫存，7 月底維修預測採購將暫停一次。",
+              "content": "緊急因目前全台庫存週轉天數偏高，為有效控管庫存，7 月底維修預測採購將暫停一次。",
               "priority": "high",
-              "tags": ["維修物料", "庫存控管"],
+              "tags": [
+                "維修物料",
+                "庫存控管"
+              ],
               "highlight": true
             }
           ]
@@ -74,7 +77,7 @@
                   "warehouseCode": "HC001",
                   "warehouseName": "新竹自行車維修物料總倉",
                   "receivedQty": 304,
-                  "outstandingQty": 196,
+                  "outstandingQty": "196",
                   "remark": "因廠商庫存已用罄，剩餘尾數 196 PCS 已取消"
                 }
               ]
@@ -111,7 +114,7 @@
                   "quantity": 5000,
                   "warehouseCode": "TP001",
                   "warehouseName": "雙北自行車維修物料總倉",
-                  "outstandingQty": 2000
+                  "outstandingQty": "2000"
                 },
                 {
                   "supplier": "U14200",
@@ -126,7 +129,7 @@
                   "quantity": 5000,
                   "warehouseCode": "TP001",
                   "warehouseName": "雙北自行車維修物料總倉",
-                  "outstandingQty": 3000
+                  "outstandingQty": "3000"
                 },
                 {
                   "supplier": "U14200",
@@ -141,7 +144,7 @@
                   "quantity": 200,
                   "warehouseCode": "TC001",
                   "warehouseName": "台中自行車維修物料總倉",
-                  "outstandingQty": 200
+                  "outstandingQty": "200"
                 },
                 {
                   "supplier": "U14200",
@@ -156,7 +159,7 @@
                   "quantity": 300,
                   "warehouseCode": "CY001",
                   "warehouseName": "嘉義自行車維修物料總倉",
-                  "outstandingQty": 300
+                  "outstandingQty": "300"
                 },
                 {
                   "supplier": "U14200",
@@ -171,7 +174,7 @@
                   "quantity": 500,
                   "warehouseCode": "HC001",
                   "warehouseName": "新竹自行車維修物料總倉",
-                  "outstandingQty": 500
+                  "outstandingQty": "500"
                 },
                 {
                   "supplier": "U14200",
@@ -186,7 +189,7 @@
                   "quantity": 250,
                   "warehouseCode": "KH001",
                   "warehouseName": "高雄自行車維修物料總倉",
-                  "outstandingQty": 250
+                  "outstandingQty": "250"
                 },
                 {
                   "supplier": "U14200",
@@ -201,7 +204,7 @@
                   "quantity": 250,
                   "warehouseCode": "TC001",
                   "warehouseName": "台中自行車維修物料總倉",
-                  "outstandingQty": 250
+                  "outstandingQty": "250"
                 },
                 {
                   "supplier": "U14200",
@@ -216,7 +219,7 @@
                   "quantity": 750,
                   "warehouseCode": "TY001",
                   "warehouseName": "桃園自行車維修物料總倉",
-                  "outstandingQty": 750
+                  "outstandingQty": "750"
                 },
                 {
                   "supplier": "U14200",
@@ -231,7 +234,7 @@
                   "quantity": 5000,
                   "warehouseCode": "TP001",
                   "warehouseName": "雙北自行車維修物料總倉",
-                  "outstandingQty": 5000
+                  "outstandingQty": "5000"
                 }
               ]
             }
@@ -265,7 +268,7 @@
               "trackingNumber": "5830-7752-8841",
               "faultType": "機台受潮出現水漬",
               "faultModel": "Y1003004 發光上蓋",
-              "quantity": 50,
+              "quantity": "50",
               "remark": "受天災影響，場內Y1003004 發光上蓋 內部機殼因淹水導致受潮，出現水漬情形。"
             }
           ]
@@ -297,7 +300,10 @@
               "id": "w28-item-001",
               "content": "6月份【工程物料】預測 已全數完成採購作業，採購進度已達成預定目標。",
               "priority": "normal",
-              "tags": ["工程物料", "預測"],
+              "tags": [
+                "工程物料",
+                "預測"
+              ],
               "highlight": false
             }
           ]
@@ -334,7 +340,7 @@
                   "quantity": 200,
                   "warehouseCode": "TP001",
                   "warehouseName": "雙北自行車維修物料總倉",
-                  "outstandingQty": 200
+                  "outstandingQty": "200"
                 },
                 {
                   "supplier": "U09002",
@@ -349,7 +355,7 @@
                   "quantity": 1000,
                   "warehouseCode": "TP001",
                   "warehouseName": "雙北自行車維修物料總倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 },
                 {
                   "supplier": "U09002",
@@ -364,7 +370,7 @@
                   "quantity": 1500,
                   "warehouseCode": "TC001",
                   "warehouseName": "台中自行車維修物料總倉",
-                  "outstandingQty": 1500
+                  "outstandingQty": "1500"
                 },
                 {
                   "supplier": "U09002",
@@ -379,7 +385,7 @@
                   "quantity": 1000,
                   "warehouseCode": "CY001",
                   "warehouseName": "嘉義自行車維修物料總倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 },
                 {
                   "supplier": "U09002",
@@ -394,7 +400,7 @@
                   "quantity": 1000,
                   "warehouseCode": "CY001",
                   "warehouseName": "嘉義自行車維修物料總倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 },
                 {
                   "supplier": "U09002",
@@ -409,7 +415,7 @@
                   "quantity": 1000,
                   "warehouseCode": "KH001",
                   "warehouseName": "高雄自行車維修物料總倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 },
                 {
                   "supplier": "U09002",
@@ -424,7 +430,7 @@
                   "quantity": 800,
                   "warehouseCode": "PD001",
                   "warehouseName": "屏東自行車維修物料總倉",
-                  "outstandingQty": 800
+                  "outstandingQty": "800"
                 }
               ]
             },
@@ -466,7 +472,7 @@
                   "quantity": 900,
                   "warehouseCode": "SCY01",
                   "warehouseName": "嘉義場站物料倉",
-                  "outstandingQty": 900
+                  "outstandingQty": "900"
                 },
                 {
                   "supplier": "U05100",
@@ -481,7 +487,7 @@
                   "quantity": 2000,
                   "warehouseCode": "SHC01",
                   "warehouseName": "新竹場站物料倉",
-                  "outstandingQty": 2000
+                  "outstandingQty": "2000"
                 },
                 {
                   "supplier": "U05100",
@@ -496,7 +502,7 @@
                   "quantity": 800,
                   "warehouseCode": "SKH01",
                   "warehouseName": "高雄場站物料倉",
-                  "outstandingQty": 800
+                  "outstandingQty": "800"
                 },
                 {
                   "supplier": "U05100",
@@ -511,7 +517,7 @@
                   "quantity": 500,
                   "warehouseCode": "SML01",
                   "warehouseName": "苗栗場站物料倉",
-                  "outstandingQty": 500
+                  "outstandingQty": "500"
                 },
                 {
                   "supplier": "U05100",
@@ -526,7 +532,7 @@
                   "quantity": 300,
                   "warehouseCode": "SPD01",
                   "warehouseName": "屏東場站物料倉",
-                  "outstandingQty": 300
+                  "outstandingQty": "300"
                 },
                 {
                   "supplier": "U05100",
@@ -541,7 +547,7 @@
                   "quantity": 800,
                   "warehouseCode": "STC01",
                   "warehouseName": "台中場站物料倉",
-                  "outstandingQty": 800
+                  "outstandingQty": "800"
                 },
                 {
                   "supplier": "U05100",
@@ -556,7 +562,7 @@
                   "quantity": 1500,
                   "warehouseCode": "STD01",
                   "warehouseName": "台東場站物料倉",
-                  "outstandingQty": 1500
+                  "outstandingQty": "1500"
                 },
                 {
                   "supplier": "U05100",
@@ -571,7 +577,7 @@
                   "quantity": 800,
                   "warehouseCode": "STN01",
                   "warehouseName": "台南場站物料倉",
-                  "outstandingQty": 800
+                  "outstandingQty": "800"
                 },
                 {
                   "supplier": "U05100",
@@ -586,7 +592,7 @@
                   "quantity": 1600,
                   "warehouseCode": "STP03",
                   "warehouseName": "北區場站物料倉2.0(總倉庫存)",
-                  "outstandingQty": 1600
+                  "outstandingQty": "1600"
                 },
                 {
                   "supplier": "U05100",
@@ -601,7 +607,7 @@
                   "quantity": 1000,
                   "warehouseCode": "STY01",
                   "warehouseName": "桃園場站物料倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 }
               ],
               "cancelledOrders": [
@@ -618,7 +624,7 @@
                   "quantity": 400,
                   "warehouseCode": "SCY01",
                   "warehouseName": "嘉義場站物料倉",
-                  "outstandingQty": 400
+                  "outstandingQty": "400"
                 },
                 {
                   "supplier": "U05100",
@@ -633,7 +639,7 @@
                   "quantity": 1800,
                   "warehouseCode": "SHC01",
                   "warehouseName": "新竹場站物料倉",
-                  "outstandingQty": 1800
+                  "outstandingQty": "1800"
                 },
                 {
                   "supplier": "U05100",
@@ -648,7 +654,7 @@
                   "quantity": 500,
                   "warehouseCode": "SKH01",
                   "warehouseName": "高雄場站物料倉",
-                  "outstandingQty": 500
+                  "outstandingQty": "500"
                 },
                 {
                   "supplier": "U05100",
@@ -663,7 +669,7 @@
                   "quantity": 500,
                   "warehouseCode": "SML01",
                   "warehouseName": "苗栗場站物料倉",
-                  "outstandingQty": 500
+                  "outstandingQty": "500"
                 },
                 {
                   "supplier": "U05100",
@@ -678,7 +684,7 @@
                   "quantity": 200,
                   "warehouseCode": "SPD01",
                   "warehouseName": "屏東場站物料倉",
-                  "outstandingQty": 200
+                  "outstandingQty": "200"
                 },
                 {
                   "supplier": "U05100",
@@ -693,7 +699,7 @@
                   "quantity": 900,
                   "warehouseCode": "STC01",
                   "warehouseName": "台中場站物料倉",
-                  "outstandingQty": 900
+                  "outstandingQty": "900"
                 },
                 {
                   "supplier": "U05100",
@@ -708,7 +714,7 @@
                   "quantity": 800,
                   "warehouseCode": "STN01",
                   "warehouseName": "台南場站物料倉",
-                  "outstandingQty": 800
+                  "outstandingQty": "800"
                 },
                 {
                   "supplier": "U05100",
@@ -723,7 +729,7 @@
                   "quantity": 1600,
                   "warehouseCode": "STP03",
                   "warehouseName": "北區場站物料倉2.0(總倉庫存)",
-                  "outstandingQty": 1600
+                  "outstandingQty": "1600"
                 },
                 {
                   "supplier": "U05100",
@@ -738,7 +744,7 @@
                   "quantity": 1000,
                   "warehouseCode": "STY01",
                   "warehouseName": "桃園場站物料倉",
-                  "outstandingQty": 1000
+                  "outstandingQty": "1000"
                 }
               ]
             }
@@ -793,7 +799,7 @@
           "items": [
             {
               "id": "w28-ar-001",
-              "content": "因近期台南地區受天災影響，導致場內 Y1003004 發光上蓋之內部機殼因淹水受潮，並發現有水漬異常情形。",
+              "content": "緊急緊急因近期台南地區受天災影響，導致場內 Y1003004 發光上蓋之內部機殼因淹水受潮，並發現有水漬異常情形。",
               "priority": "high"
             },
             {
@@ -814,7 +820,7 @@
               "repairUnit": "台南營運",
               "faultType": "機台受潮出現水漬",
               "faultModel": "Y1003004 發光上蓋",
-              "quantity": null,
+              "quantity": "",
               "remark": "受天災影響，場內Y1003004 發光上蓋 內部機殼因淹水導致受潮，出現水漬情形。"
             }
           ]
@@ -827,7 +833,7 @@
           "items": [
             {
               "id": "w28-pi-001",
-              "content": "佳承精工於 2026/7/8 通知，由於環保電鍍、線材及運輸等相關成本已多次調漲，現行價格已無法反映實際成本，擬自 2026 年 9 月起調整售價。",
+              "content": "緊急緊急錦佳螺絲於 2026/7/8 通知，由於環保電鍍、線材及運輸等相關成本已多次調漲，現行價格已無法反映實際成本，擬自 2026 年 9 月起調整售價。",
               "supplier": "佳承精工",
               "priority": "high"
             },
@@ -903,14 +909,21 @@
               "id": "w27-item-001",
               "content": "6月份[維修物料]預測 已全數完成採購作業，列管物料採購例外申請，亦已完成簽核，相關作業依計畫推進。",
               "priority": "normal",
-              "tags": ["維修物料", "預測"],
+              "tags": [
+                "維修物料",
+                "預測"
+              ],
               "highlight": false
             },
             {
               "id": "w27-item-002",
-              "content": "6月份[工程物料]預測 請於7/2起提出申請，並於7/6 (17:30) 前完成簽核，以利後續採購作業順利進行。",
+              "content": "緊急6月份[工程物料]預測 請於7/2起提出申請，並於7/6 (17:30) 前完成簽核，以利後續採購作業順利進行。",
               "priority": "high",
-              "tags": ["工程物料", "預測", "deadline"],
+              "tags": [
+                "工程物料",
+                "預測",
+                "deadline"
+              ],
               "highlight": true,
               "deadline": "2026-07-06T17:30:00+08:00"
             },
@@ -918,14 +931,19 @@
               "id": "w27-item-003",
               "content": "6 月份全台各營運處共收進廠商送貨單 363 張，整體準時提供達成率為98%。（含 1–2 天延遲容許）。",
               "priority": "normal",
-              "tags": ["送貨達成率"],
+              "tags": [
+                "送貨達成率"
+              ],
               "highlight": false
             },
             {
               "id": "w27-item-004",
-              "content": "7月份廠商關帳通知已發送完成，各廠商最後進貨日為7/20。惟 巨大、良豐、超寶 三家廠商之最後進貨日延長至 7/24，敬請相關同仁留意時程，並務必於期限內完成進貨作業。",
+              "content": "緊急7月份廠商關帳通知已發送完成，各廠商最後進貨日為7/20。惟 巨大、良豐、超寶 三家廠商之最後進貨日延長至 7/24，敬請相關同仁留意時程，並務必於期限內完成進貨作業。",
               "priority": "high",
-              "tags": ["關帳", "deadline"],
+              "tags": [
+                "關帳",
+                "deadline"
+              ],
               "highlight": true,
               "deadline": "2026-07-20T00:00:00+08:00"
             }
@@ -993,7 +1011,8 @@
                   "partNumber": "75507500",
                   "quantity": 500,
                   "warehouseCode": "TP001",
-                  "warehouseName": "雙北自行車維修物料總倉"
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": ""
                 }
               ]
             }
