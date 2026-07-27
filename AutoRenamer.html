@@ -11,29 +11,29 @@
   
   <style>
     :root {
-      --bg-gradient-start: #0f172a;
-      --bg-gradient-end: #0f0c1b;
-      --card-bg: rgba(30, 41, 59, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --primary-glow: rgba(99, 102, 241, 0.4);
+      --bg-gradient-start: #fff0f5; /* LavenderBlush */
+      --bg-gradient-end: #fdf2f8; /* Pink 50 */
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(244, 114, 182, 0.2); /* Pink 400 */
+      --primary: #db2777; /* Pink 600 */
+      --primary-hover: #be185d; /* Pink 700 */
+      --primary-glow: rgba(255, 255, 255, 0.2);
       --success: #10b981;
-      --success-bg: rgba(16, 185, 129, 0.15);
-      --success-border: rgba(16, 185, 129, 0.3);
+      --success-bg: rgba(16, 185, 129, 0.1);
+      --success-border: rgba(16, 185, 129, 0.2);
       --error: #f43f5e;
-      --error-bg: rgba(244, 63, 94, 0.15);
-      --error-border: rgba(244, 63, 94, 0.3);
+      --error-bg: rgba(244, 63, 94, 0.1);
+      --error-border: rgba(244, 63, 94, 0.2);
       --warning: #f59e0b;
-      --warning-bg: rgba(245, 158, 11, 0.15);
+      --warning-bg: rgba(245, 158, 11, 0.1);
       --info: #0ea5e9;
-      --info-bg: rgba(14, 165, 233, 0.15);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dark: #475569;
-      --border-radius-lg: 16px;
-      --border-radius-md: 12px;
-      --border-radius-sm: 8px;
+      --info-bg: rgba(14, 165, 233, 0.1);
+      --text-main: #334155; /* Slate 700 */
+      --text-muted: #64748b; /* Slate 500 */
+      --text-dark: #94a3b8; /* Slate 400 */
+      --border-radius-lg: 20px;
+      --border-radius-md: 16px;
+      --border-radius-sm: 12px;
       --transition-fast: 0.2s ease;
       --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -45,8 +45,8 @@
     }
 
     body {
-      font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
-      background: radial-gradient(circle at 50% 50%, var(--bg-gradient-end) 0%, var(--bg-gradient-start) 100%);
+      font-family: 'Nunito', 'Quicksand', 'Outfit', 'Segoe UI', system-ui, sans-serif;
+      background: radial-gradient(circle at 50% 0%, var(--bg-gradient-end) 0%, var(--bg-gradient-start) 100%);
       color: var(--text-main);
       min-height: 100vh;
       padding: 2rem 1rem;
@@ -74,7 +74,7 @@
     header h1 {
       font-size: 2.5rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #d8b4fe 100%);
+      background: linear-gradient(135deg, #f472b6 0%, #db2777 50%, #9d174d 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 0.5rem;
@@ -84,7 +84,7 @@
     header p {
       color: var(--text-muted);
       font-size: 1.1rem;
-      font-weight: 300;
+      font-weight: 500;
     }
 
     /* Browser Compatibility Alert */
@@ -383,27 +383,27 @@
     }
 
     .console-box {
-      background: rgba(10, 15, 30, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(244, 114, 182, 0.4);
       border-radius: var(--border-radius-md);
       padding: 0.875rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       height: 180px;
       overflow-y: auto;
-      color: #a7f3d0;
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
       scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+      scrollbar-color: rgba(244, 114, 182, 0.5) transparent;
     }
 
     .console-box::-webkit-scrollbar {
       width: 6px;
     }
     .console-box::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(244, 114, 182, 0.5);
       border-radius: 3px;
     }
 
@@ -413,10 +413,10 @@
       white-space: pre-wrap;
     }
 
-    .console-line.system { color: #818cf8; }
-    .console-line.success { color: #34d399; }
-    .console-line.error { color: #fb7185; }
-    .console-line.warning { color: #fbbf24; }
+    .console-line.system { color: var(--primary); font-weight: 600; }
+    .console-line.success { color: var(--success); font-weight: 600; }
+    .console-line.error { color: var(--error); font-weight: 600; }
+    .console-line.warning { color: var(--warning); font-weight: 600; }
 
     /* Stats Dashboard */
     .stats-row {
@@ -903,18 +903,18 @@
       opacity: 1;
     }
     .glass-modal-content {
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(244, 114, 182, 0.4);
       backdrop-filter: blur(16px);
       border-radius: 16px;
       padding: 2rem;
       max-width: 500px;
       width: 90%;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(244, 114, 182, 0.2);
       position: relative;
       transform: translateY(20px);
       transition: transform 0.3s ease;
-      color: var(--text-light);
+      color: var(--text-main);
     }
     .glass-modal.show .glass-modal-content {
       transform: translateY(0);
@@ -930,23 +930,23 @@
       transition: color 0.2s;
     }
     .glass-modal-close:hover {
-      color: white;
+      color: var(--primary);
     }
     .manual-btn {
       position: absolute;
       top: 1rem; right: 1rem;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--primary);
       padding: 0.5rem 1rem;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       backdrop-filter: blur(4px);
       transition: all 0.2s;
     }
     .manual-btn:hover {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
     }
     .manual-step {
       margin-bottom: 1.5rem;
@@ -960,6 +960,31 @@
       font-size: 0.95rem;
       color: var(--text-muted);
       line-height: 1.4;
+    }
+    /* Sakura Snow Effect */
+    .sakura-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+    .sakura {
+      position: absolute;
+      top: -20px;
+      background: #ffb7c5;
+      border-radius: 100% 0 100% 0;
+      opacity: 0.8;
+      box-shadow: 0 0 4px rgba(255,183,197,0.8);
+      animation: fall linear infinite, sway ease-in-out infinite alternate;
+    }
+    @keyframes fall {
+      to { top: 110vh; }
+    }
+    @keyframes sway {
+      from { transform: translateX(0) rotate(0deg); }
+      to { transform: translateX(100px) rotate(45deg); }
     }
   </style>
 </head>
@@ -982,16 +1007,13 @@
       <!-- LEFT COLUMN: Controllers -->
       <div class="panel-card">
         
-        <!-- API Configuration Panel -->
-        <div class="api-config-container">
+        <!-- API Configuration Panel (隱藏並綁死金鑰) -->
+        <div class="api-config-container" style="display: none;">
           <div class="api-config-header">
             <label for="apiKeyInput">Gemini API 金鑰設定</label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank">
-              獲取免費 Key (AI Studio) ↗
-            </a>
           </div>
           <div class="api-input-wrapper">
-            <input type="password" id="apiKeyInput" class="api-input" placeholder="請在此輸入 API 金鑰 (自動記憶)">
+            <input type="password" id="apiKeyInput" class="api-input" value="">
           </div>
         </div>
 
@@ -1132,20 +1154,20 @@
       <button class="glass-modal-close" id="manualCloseBtn">&times;</button>
       <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📖 操作說明</h2>
       
-      <div class="manual-step">
+      <div class="manual-step" style="display: none;">
         <h3>第一步：輸入金鑰🔑</h3>
         <p>請於上方輸入專屬的 Gemini API Key。</p>
       </div>
       <div class="manual-step">
-        <h3>第二步：授權存檔📂</h3>
+        <h3>第一步：授權存檔📂</h3>
         <p>點擊「選取儲存資料夾」，授權瀏覽器將改名後的照片存入你指定的本地資料夾。</p>
       </div>
       <div class="manual-step">
-        <h3>第三步：批次匯入🖼️</h3>
+        <h3>第二步：批次匯入🖼️</h3>
         <p>直接將一張或多張出貨單照片「拖曳」到下方虛線框內，或點擊選取。</p>
       </div>
       <div class="manual-step">
-        <h3>第四步：自動運行⚡</h3>
+        <h3>第三步：自動運行⚡</h3>
         <p>系統將排隊進行 AI 辨識，成功會自動改名存檔，失敗或無法辨識的會幫你分類到「人工確認區」。</p>
       </div>
     </div>
@@ -1164,6 +1186,63 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script>
+    // -------------------------------------------------------------
+    // Magic Link (魔法連結) 資安防護邏輯
+    // -------------------------------------------------------------
+    (function initMagicLink() {
+      const params = new URLSearchParams(window.location.search);
+      const keyParam = params.get('key');
+      
+      if (keyParam) {
+        // 儲存金鑰到瀏覽器本地端
+        localStorage.setItem('geminiApiKey', keyParam);
+        
+        // 將網址列上的 ?key=... 瞬間移除，避免被同事複製外流或在螢幕分享時曝光
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        
+        console.log('[資安系統] Magic Link 已載入，金鑰已安全鎖定於本地端。');
+      }
+    })();
+
+    // -------------------------------------------------------------
+    // Sakura Festival Effect
+    // -------------------------------------------------------------
+    let sakuraInterval = null;
+    function startSakura() {
+      if (document.getElementById('sakuraContainer')) return;
+      const container = document.createElement('div');
+      container.id = 'sakuraContainer';
+      container.className = 'sakura-container';
+      document.body.appendChild(container);
+
+      sakuraInterval = setInterval(() => {
+        const sakura = document.createElement('div');
+        sakura.className = 'sakura';
+        const size = Math.random() * 8 + 8; // 8px to 16px
+        sakura.style.width = size + 'px';
+        sakura.style.height = size + 'px';
+        sakura.style.left = Math.random() * 100 + 'vw';
+        sakura.style.animationDuration = (Math.random() * 3 + 4) + 's, ' + (Math.random() * 2 + 3) + 's';
+        
+        container.appendChild(sakura);
+        
+        // Remove after it falls (approx 8 seconds)
+        setTimeout(() => {
+          if(sakura.parentNode) sakura.remove();
+        }, 8000);
+      }, 300);
+    }
+    function stopSakura() {
+      clearInterval(sakuraInterval);
+      const container = document.getElementById('sakuraContainer');
+      if(container) {
+        container.style.transition = 'opacity 2s';
+        container.style.opacity = '0';
+        setTimeout(() => container.remove(), 2000);
+      }
+    }
+
     // -------------------------------------------------------------
     // 全域變數定義
     // -------------------------------------------------------------
@@ -1497,11 +1576,12 @@
     async function processQueue() {
       if (isProcessing) return;
 
-      // 檢查金鑰
-      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      // 檢查金鑰 (從 localStorage 讀取)
+      const apiKey = localStorage.getItem('geminiApiKey');
       if (!apiKey) {
-        showToast('error', '請先輸入您的 Gemini API Key！');
-        addConsoleLine('[系統] 錯誤：未輸入 Gemini API Key！已終止處理。', 'error');
+        showToast('error', '未偵測到金鑰！請聯絡管理員取得專屬魔法連結。');
+        addConsoleLine('[系統] 錯誤：未偵測到 Gemini API Key！已終止處理。', 'error');
+        alert('安全提示：\n未偵測到授權金鑰。\n\n如果您是第一次使用，請務必點擊管理員提供給您的「專屬魔法連結」來開啟本系統！');
         return;
       }
 
@@ -1509,6 +1589,7 @@
       addConsoleLine('[系統] 開始調用 Gemini 3.6 Flash API 處理佇列...', 'system');
 
       try {
+        startSakura(); // 開始飄落櫻花
         // 使用 for...of 迴圈循序處理，避免 Promise.all 併發
         const itemsToProcess = fileQueue.filter(i => i.status === 'waiting');
         const totalItems = fileQueue.length;
@@ -1534,6 +1615,7 @@
         console.error(err);
         addConsoleLine(`[系統] 佇列執行異常: ${err.message}`, 'error');
       } finally {
+        stopSakura(); // 停止飄落櫻花
         activeItemId = null;
         isProcessing = false;
         updateStats();
