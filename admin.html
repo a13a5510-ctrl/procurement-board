@@ -119,6 +119,9 @@
         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
         <span class="font-bold tracking-wide">專案開發成果</span>
       </button>
+      <button onclick="showKM()" class="btn-s w-full justify-center text-sm text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 mt-2">
+        <span class="font-bold tracking-wide">📚 關鍵字資料庫維護</span>
+      </button>
       <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
         <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
@@ -397,6 +400,18 @@ const DS = {
       console.error(e);
     }
   },
+  async getKeywords() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('dictionary').doc('keywords').get();
+      if (snap.exists) { return snap.data().categories || []; }
+      return [];
+    } catch(e) { console.error(e); return []; }
+  },
+  async saveKeywords(categories) {
+    if (!this.isConfigured()) return;
+    try { await db.collection('dictionary').doc('keywords').set({ categories: categories }); } catch(e) { console.error(e); }
+  },
   async getTpls() {
     const defaultTpls = [
       { id: 't1', t: '採購作業進度', i: '📋', hi: true },
@@ -536,9 +551,10 @@ if (DS.isConfigured()) {
   }
 }
 
-const S={cur:null,dirty:false,fbs:[],tpls:[],mmap:{},amon:null,users:[]};
+const S={cur:null,dirty:false,fbs:[],tpls:[],keywords:[],mmap:{},amon:null,users:[]};
 async function init(){
   S.tpls=await DS.getTpls();
+  S.keywords=await DS.getKeywords();
   S.users=await DS.getUsers();
   S.mmap=await DS.getMonths();
   
@@ -800,11 +816,18 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
 function renderSecs(){const c=document.getElementById('sc');const b=S.cur;if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');}
-const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.tpls.find(t=>t.t===sec.title);return`<div class="p-5 hover:bg-slate-50/40 transition-colors border-t border-slate-100 first:border-0">
+const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
+const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
+const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
+return`<div class="p-5 hover:bg-slate-50/40 transition-colors border-t border-slate-100 first:border-0">
 <div class="flex items-center gap-2 mb-3">
 <select class="form-input csel w-16 text-center text-lg py-1" onchange="uSec(${si},'icon',this.value)">${ICONS.map(ic=>`<option ${sec.icon===ic?'selected':''} value="${ic}">${ic}</option>`).join('')}</select>
-<select class="form-input csel flex-1 font-semibold py-1" onchange="sTitleSel(${si},this.value)">${S.tpls.map(t=>`<option value="${t.t}" ${sec.title===t.t?'selected':''}>${t.t}</option>`).join('')}<option value="__c__" ${isCust?'selected':''}>自訂...</option></select>
-<span class="text-xs text-slate-400 font-medium">${NUMS[si]||si+1}、</span>
+<select class="form-input csel flex-1 font-semibold py-1 max-w-[200px]" onchange="sTitleSel(${si},this.value)">${S.keywords.map(c=>`<option value="${c.name}" ${sec.title===c.name?'selected':''}>${c.name}</option>`).join('')}<option value="__c__" ${isCust?'selected':''}>自訂...</option></select>
+<div class="flex-1 relative ml-1">
+  ${dlHTML}
+  <input list="dl-${si}" class="form-input text-sm py-1 font-medium text-slate-700 w-full" value="${xe(sec.subtitle||'')}" placeholder="請選擇或輸入子標題關鍵字..." onchange="uSec(${si},'subtitle',this.value)" ${isCust ? 'disabled' : ''}>
+</div>
+<span class="text-xs text-slate-400 font-medium ml-2">${NUMS[si]||si+1}、</span>
 <button onclick="mvUp(${si})" class="bic" title="上移"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
 <button onclick="mvDn(${si})" class="bic" title="下移"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
 <button onclick="rmSec(${si})" class="bic d" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -840,7 +863,7 @@ function bldItems(sec,si){const items=sec.items||[];return`<div class="mb-3"><di
   S.dirty=true;
   hideModal();
   renderSecs();
-}function addCustomSec(){const title=document.getElementById('ct').value.trim(),icon=document.getElementById('ci').value.trim()||'📝';if(!title){toast('請輸入段落標題','er');return;}const i=(S.cur.sections||[]).length;if(!S.cur.sections)S.cur.sections=[];S.cur.sections.push({id:`s${i+1}-${Date.now()}`,sectionNumber:NUMS[i]||String(i+1),title,icon,items:[]});S.dirty=true;hideModal();renderSecs();}function uSec(si,f,v){S.cur.sections[si][f]=v;S.dirty=true;}function sTitleSel(si,v){const ci=document.getElementById(`cti-${si}`);if(v==='__c__'){ci&&ci.classList.remove('hidden');}else{ci&&ci.classList.add('hidden');S.cur.sections[si].title=v;const t=S.tpls.find(tp=>tp.t===v);if(t)S.cur.sections[si].icon=t.i;S.dirty=true;}}function rmSec(si){if(!confirm('確定移除？'))return;S.cur.sections.splice(si,1);S.dirty=true;renderSecs();}function mvUp(si){if(si===0)return;const s=S.cur.sections;[s[si-1],s[si]]=[s[si],s[si-1]];S.dirty=true;renderSecs();}function mvDn(si){const s=S.cur.sections;if(si>=s.length-1)return;[s[si],s[si+1]]=[s[si+1],s[si]];S.dirty=true;renderSecs();}function addItm(si){if(!S.cur.sections[si].items)S.cur.sections[si].items=[];S.cur.sections[si].items.push({id:`i-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmItm(si,ii){S.cur.sections[si].items.splice(ii,1);S.dirty=true;renderSecs();}function uItm(si,ii,f,v){S.cur.sections[si].items[ii][f]=v;S.dirty=true;}function addSub(si){if(!S.cur.sections[si].subsections)S.cur.sections[si].subsections=[];const idx=S.cur.sections[si].subsections.length;S.cur.sections[si].subsections.push({id:`sub-${Date.now()}`,subsectionNumber:String(idx+1),title:'',items:[]});S.dirty=true;renderSecs();}function rmSub(si,sbi){S.cur.sections[si].subsections.splice(sbi,1);S.dirty=true;renderSecs();}function uSub(si,sbi,f,v){S.cur.sections[si].subsections[sbi][f]=v;S.dirty=true;}function addSI(si,sbi){if(!S.cur.sections[si].subsections[sbi].items)S.cur.sections[si].subsections[sbi].items=[];S.cur.sections[si].subsections[sbi].items.push({id:`si-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmSI(si,sbi,ii){S.cur.sections[si].subsections[sbi].items.splice(ii,1);S.dirty=true;renderSecs();}function uSI(si,sbi,ii,f,v){S.cur.sections[si].subsections[sbi].items[ii][f]=v;S.dirty=true;}function addRow(si,field){if(!S.cur.sections[si][field])S.cur.sections[si][field]=[];S.cur.sections[si][field].push({supplierName:'',poNumber:'',lineNumber:'',partNumber:'',itemName:'',quantity:0,originalDelivery:'',newDelivery:'',warehouseName:''});S.dirty=true;renderSecs();}function rmRow(si,field,ri){S.cur.sections[si][field].splice(ri,1);S.dirty=true;renderSecs();}function uRow(si,field,ri,col,v){S.cur.sections[si][field][ri][col]=v;S.dirty=true;}function addRep(si){if(!S.cur.sections[si].repairRecords)S.cur.sections[si].repairRecords=[];S.cur.sections[si].repairRecords.push({supplierName:'',repairUnit:'',repairDate:'',trackingNumber:'',faultType:'',faultModel:'',quantity:0});S.dirty=true;renderSecs();}function rmRep(si,ri){S.cur.sections[si].repairRecords.splice(ri,1);S.dirty=true;renderSecs();}function uRep(si,ri,f,v){S.cur.sections[si].repairRecords[ri][f]=v;S.dirty=true;}function addPrc(si){if(!S.cur.sections[si].priceChangeItems)S.cur.sections[si].priceChangeItems=[];S.cur.sections[si].priceChangeItems.push({supplierName:'',partNumber:'',description:''});S.dirty=true;renderSecs();}function rmPrc(si,ri){S.cur.sections[si].priceChangeItems.splice(ri,1);S.dirty=true;renderSecs();}function uPrc(si,ri,f,v){S.cur.sections[si].priceChangeItems[ri][f]=v;S.dirty=true;}function uFile(si,fi,f,v){S.cur.sections[si].files[fi][f]=v;S.dirty=true;}function rmFile(si,fi){if(!confirm('確定移除？'))return;S.cur.sections[si].files.splice(fi,1);S.dirty=true;renderSecs();}async function upFile(el,si){
+}function addCustomSec(){const title=document.getElementById('ct').value.trim(),icon=document.getElementById('ci').value.trim()||'📝';if(!title){toast('請輸入段落標題','er');return;}const i=(S.cur.sections||[]).length;if(!S.cur.sections)S.cur.sections=[];S.cur.sections.push({id:`s${i+1}-${Date.now()}`,sectionNumber:NUMS[i]||String(i+1),title,icon,items:[]});S.dirty=true;hideModal();renderSecs();}function uSec(si,f,v){S.cur.sections[si][f]=v;S.dirty=true;}function sTitleSel(si,v){const ci=document.getElementById(`cti-${si}`);if(v==='__c__'){ci&&ci.classList.remove('hidden');}else{ci&&ci.classList.add('hidden');S.cur.sections[si].title=v;S.cur.sections[si].subtitle='';const c=S.keywords.find(tp=>tp.name===v);if(c)S.cur.sections[si].icon='📋';S.dirty=true;}renderSecs();}function rmSec(si){if(!confirm('確定移除？'))return;S.cur.sections.splice(si,1);S.dirty=true;renderSecs();}function mvUp(si){if(si===0)return;const s=S.cur.sections;[s[si-1],s[si]]=[s[si],s[si-1]];S.dirty=true;renderSecs();}function mvDn(si){const s=S.cur.sections;if(si>=s.length-1)return;[s[si],s[si+1]]=[s[si+1],s[si]];S.dirty=true;renderSecs();}function addItm(si){if(!S.cur.sections[si].items)S.cur.sections[si].items=[];S.cur.sections[si].items.push({id:`i-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmItm(si,ii){S.cur.sections[si].items.splice(ii,1);S.dirty=true;renderSecs();}function uItm(si,ii,f,v){S.cur.sections[si].items[ii][f]=v;S.dirty=true;}function addSub(si){if(!S.cur.sections[si].subsections)S.cur.sections[si].subsections=[];const idx=S.cur.sections[si].subsections.length;S.cur.sections[si].subsections.push({id:`sub-${Date.now()}`,subsectionNumber:String(idx+1),title:'',items:[]});S.dirty=true;renderSecs();}function rmSub(si,sbi){S.cur.sections[si].subsections.splice(sbi,1);S.dirty=true;renderSecs();}function uSub(si,sbi,f,v){S.cur.sections[si].subsections[sbi][f]=v;S.dirty=true;}function addSI(si,sbi){if(!S.cur.sections[si].subsections[sbi].items)S.cur.sections[si].subsections[sbi].items=[];S.cur.sections[si].subsections[sbi].items.push({id:`si-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmSI(si,sbi,ii){S.cur.sections[si].subsections[sbi].items.splice(ii,1);S.dirty=true;renderSecs();}function uSI(si,sbi,ii,f,v){S.cur.sections[si].subsections[sbi].items[ii][f]=v;S.dirty=true;}function addRow(si,field){if(!S.cur.sections[si][field])S.cur.sections[si][field]=[];S.cur.sections[si][field].push({supplierName:'',poNumber:'',lineNumber:'',partNumber:'',itemName:'',quantity:0,originalDelivery:'',newDelivery:'',warehouseName:''});S.dirty=true;renderSecs();}function rmRow(si,field,ri){S.cur.sections[si][field].splice(ri,1);S.dirty=true;renderSecs();}function uRow(si,field,ri,col,v){S.cur.sections[si][field][ri][col]=v;S.dirty=true;}function addRep(si){if(!S.cur.sections[si].repairRecords)S.cur.sections[si].repairRecords=[];S.cur.sections[si].repairRecords.push({supplierName:'',repairUnit:'',repairDate:'',trackingNumber:'',faultType:'',faultModel:'',quantity:0});S.dirty=true;renderSecs();}function rmRep(si,ri){S.cur.sections[si].repairRecords.splice(ri,1);S.dirty=true;renderSecs();}function uRep(si,ri,f,v){S.cur.sections[si].repairRecords[ri][f]=v;S.dirty=true;}function addPrc(si){if(!S.cur.sections[si].priceChangeItems)S.cur.sections[si].priceChangeItems=[];S.cur.sections[si].priceChangeItems.push({supplierName:'',partNumber:'',description:''});S.dirty=true;renderSecs();}function rmPrc(si,ri){S.cur.sections[si].priceChangeItems.splice(ri,1);S.dirty=true;renderSecs();}function uPrc(si,ri,f,v){S.cur.sections[si].priceChangeItems[ri][f]=v;S.dirty=true;}function uFile(si,fi,f,v){S.cur.sections[si].files[fi][f]=v;S.dirty=true;}function rmFile(si,fi){if(!confirm('確定移除？'))return;S.cur.sections[si].files.splice(fi,1);S.dirty=true;renderSecs();}async function upFile(el,si){
   const file=el.files[0];if(!file)return;
   if(file.size>20*1024*1024){toast('超過 20MB 限制','er');return;}
   const label = el.parentElement;
@@ -1046,5 +1069,95 @@ function hideAchievements() {
     </div>
   </div>
 
-  </body>
+  <!-- Keyword Maintenance Modal -->
+  <div id="km" class="hidden fixed inset-0 z-[110] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+    <div class="w-full max-w-5xl h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden m-4">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">📚 關鍵字資料庫維護</h3>
+        <button onclick="hideKM()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-500 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="flex-1 flex overflow-hidden">
+        <!-- Left: Categories -->
+        <div class="w-1/3 border-r border-slate-200 bg-slate-50/50 flex flex-col">
+          <div class="p-3 border-b border-slate-200 font-semibold text-sm text-slate-600 bg-white shadow-sm z-10">母標題 (類別)</div>
+          <div class="flex-1 overflow-y-auto p-2" id="km-cat-list"></div>
+        </div>
+        <!-- Right: Keywords -->
+        <div class="flex-1 flex flex-col bg-white relative">
+          <div class="p-3 border-b border-slate-200 flex items-center justify-between shadow-sm z-10">
+            <span class="font-semibold text-sm text-slate-600" id="km-kw-title">請選擇左側母標題</span>
+            <button onclick="addKW()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded hover:bg-blue-100 transition-colors">＋ 新增關鍵字</button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 bg-slate-50/30" id="km-kw-list">
+            <div class="text-center text-slate-400 mt-10 text-sm">請從左側選擇一個母標題來編輯對應的子標題</div>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+        <button onclick="hideKM()" class="btn-s">取消</button>
+        <button onclick="saveKMDb()" class="btn-p">💾 儲存並發布生效</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let tempKw = [];
+    let curKwId = null;
+    function showKM() {
+      tempKw = JSON.parse(JSON.stringify(S.keywords));
+      document.getElementById('km').classList.remove('hidden');
+      if (tempKw.length > 0) selKMCat(tempKw[0].id);
+      renderKMCats();
+    }
+    function hideKM() { document.getElementById('km').classList.add('hidden'); }
+    function renderKMCats() {
+      const c = document.getElementById('km-cat-list');
+      c.innerHTML = tempKw.map(cat => `<div onclick="selKMCat('${cat.id}')" class="p-3 mb-1.5 rounded-lg cursor-pointer transition-colors border ${cat.id===curKwId ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm font-semibold' : 'bg-white border-transparent text-slate-600 hover:bg-slate-100 hover:border-slate-200'} flex items-center justify-between text-sm"><span class="truncate">${cat.name}</span><span class="text-xs bg-white px-2 py-0.5 rounded-full shadow-sm text-slate-500">${(cat.keywords||[]).length}</span></div>`).join('');
+    }
+    function selKMCat(id) {
+      curKwId = id;
+      renderKMCats();
+      const cat = tempKw.find(c => c.id === id);
+      document.getElementById('km-kw-title').textContent = cat ? cat.name + ' - 子標題管理' : '';
+      renderKWs();
+    }
+    function renderKWs() {
+      const c = document.getElementById('km-kw-list');
+      const cat = tempKw.find(cat => cat.id === curKwId);
+      if (!cat) return;
+      if (!cat.keywords || cat.keywords.length === 0) {
+        c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">尚無任何關鍵字子標題</div>';
+        return;
+      }
+      cat.keywords.sort((a,b)=>a.order-b.order);
+      c.innerHTML = cat.keywords.map((k, i) => `
+        <div class="flex items-center gap-3 bg-white p-3 mb-2 rounded-lg border border-slate-200 shadow-sm hover:border-blue-300 transition-colors group">
+          <div class="cursor-move text-slate-300 hover:text-slate-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </div>
+          <input type="text" class="form-input flex-1 font-medium text-sm border-transparent hover:border-slate-200 focus:border-blue-400 bg-transparent focus:bg-white" value="${k.text}" onchange="uKWText('${k.id}', this.value)">
+          <div class="flex items-center gap-2 border-l border-slate-100 pl-3">
+            <button onclick="tgKWActive('${k.id}')" class="px-3 py-1 rounded text-xs font-semibold ${k.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}">${k.isActive !== false ? '啟用中' : '已停用'}</button>
+            <button onclick="mvKWUp('${k.id}')" class="p-1 rounded hover:bg-slate-100 text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+            <button onclick="mvKWDn('${k.id}')" class="p-1 rounded hover:bg-slate-100 text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+          </div>
+        </div>
+      `).join('');
+    }
+    function getCurCat() { return tempKw.find(cat => cat.id === curKwId); }
+    function uKWText(kwId, val) { const c = getCurCat(); const k = c.keywords.find(x => x.id === kwId); if(k) k.text = val; }
+    function tgKWActive(kwId) { const c = getCurCat(); const k = c.keywords.find(x => x.id === kwId); if(k) k.isActive = (k.isActive === false ? true : false); renderKWs(); }
+    function addKW() { const c = getCurCat(); if(!c)return; if(!c.keywords) c.keywords=[]; c.keywords.push({id: 'kw_'+Date.now(), text: '新關鍵字', isActive: true, order: c.keywords.length+1}); renderKWs(); renderKMCats(); }
+    function mvKWUp(kwId) { const c = getCurCat(); const idx = c.keywords.findIndex(x => x.id === kwId); if(idx>0){ [c.keywords[idx-1], c.keywords[idx]] = [c.keywords[idx], c.keywords[idx-1]]; c.keywords.forEach((x,i)=>x.order=i+1); renderKWs(); } }
+    function mvKWDn(kwId) { const c = getCurCat(); const idx = c.keywords.findIndex(x => x.id === kwId); if(idx<c.keywords.length-1){ [c.keywords[idx], c.keywords[idx+1]] = [c.keywords[idx+1], c.keywords[idx]]; c.keywords.forEach((x,i)=>x.order=i+1); renderKWs(); } }
+    async function saveKMDb() {
+      try {
+        await DS.saveKeywords(tempKw);
+        S.keywords = tempKw;
+        toast('關鍵字資料庫已更新並生效！', 'ok');
+        hideKM();
+        if(S.cur) renderSecs();
+      } catch(e) { toast('儲存失敗', 'er'); }
+    }
+  </script>
+</body>
 </html>
