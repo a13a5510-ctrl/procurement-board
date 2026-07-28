@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -1637,12 +1637,14 @@
     }
 
     // 處理單一圖片項目 (改為直接呼叫 Gemini REST API)
-    async function processItem(item, apiKey) {
-      item.status = 'processing';
-      item.progress = 10;
-      renderQueueItem(item.id);
-      updateStats();
-      addConsoleLine(`[開始] 處理檔案: ${item.name}`, 'system');
+    async function processItem(item, apiKey, retryCount = 0) {
+      if (retryCount === 0) {
+        item.status = 'processing';
+        item.progress = 10;
+        renderQueueItem(item.id);
+        updateStats();
+        addConsoleLine(`[開始] 處理檔案: ${item.name}`, 'system');
+      }
 
       try {
         // 1. 影像預處理：將圖片轉成 Base64 字串
@@ -1696,8 +1698,15 @@
         if (progressFill) progressFill.style.width = '80%';
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error?.message || `API 伺回傳異常錯誤: ${response.status}`);
+          let errorData = {};
+          try {
+            errorData = await response.json();
+          } catch(e) {}
+          
+          if (response.status === 429) {
+            throw new Error('RATE_LIMIT_EXCEEDED');
+          }
+          throw new Error(errorData.error?.message || `API 伺服器回傳異常錯誤: ${response.status}`);
         }
 
         const resJson = await response.json();
@@ -1786,6 +1795,14 @@
         }
       } catch (err) {
         console.error(err);
+        
+        if (err.message === 'RATE_LIMIT_EXCEEDED' && retryCount < 2) {
+          addConsoleLine(`[警告] 遇到 API 速率限制 (429)，自動啟動 15 秒智慧冷卻... (重試次數: ${retryCount + 1}/2)`, 'warning');
+          await new Promise(resolve => setTimeout(resolve, 15000));
+          addConsoleLine(`[重試] 冷卻完畢，自動為 ${item.name} 重新發起請求。`, 'system');
+          return await processItem(item, apiKey, retryCount + 1);
+        }
+
         item.status = 'failed';
         item.progress = 100;
         item.errorMsg = err.message || '辨識或檔案存取異常 (請按 F12 看 Console)';
