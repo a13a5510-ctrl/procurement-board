@@ -1039,6 +1039,12 @@
           <h2>拖放照片辨識</h2>
         </div>
         
+        <!-- 新增: 複數單號選項 -->
+        <div class="checkbox-container" style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main); font-size: 0.85rem; padding-left: 0.5rem;">
+          <input type="checkbox" id="allowMultipleOrders" style="accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer;">
+          <label for="allowMultipleOrders" style="cursor: pointer; user-select: none;">允許複數單號命名 (合併多個打勾單號)</label>
+        </div>
+        
         <!-- Drag zone (disabled by default) -->
         <div id="dragZone" class="drag-zone disabled">
           <div class="drag-lock-overlay" id="dragLockOverlay">
@@ -1126,14 +1132,14 @@
           </div>
 
           <!-- Queue List -->
+          <div id="emptyState" class="empty-state">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>目前沒有待處理的圖片</div>
+            <p style="font-size: 0.8rem; color: var(--text-dark);">請先設定 API Key 與選擇資料夾，再將圖片拖曳至此</p>
+          </div>
           <div id="queueContainer" class="queue-container">
-            <div id="emptyState" class="empty-state">
-              <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <div>目前沒有待處理的圖片</div>
-              <p style="font-size: 0.8rem; color: var(--text-dark);">請先設定 API Key 與選擇資料夾，再將圖片拖曳至此</p>
-            </div>
           </div>
 
         </div>
@@ -1469,7 +1475,6 @@
 
       if (fileQueue.length === 0) {
         container.innerHTML = '';
-        container.appendChild(emptyState);
         emptyState.style.display = 'flex';
         clearBtn.style.display = 'none';
         queueCount.innerText = '共 0 張';
@@ -1664,12 +1669,17 @@
         // 確保純 Base64，移除前綴
         const cleanBase64Data = base64Data.replace(/^data:image\/\w+;base64,/, '');
 
+        const allowMultiple = document.getElementById('allowMultipleOrders').checked;
+        const promptInstruction = allowMultiple 
+          ? "【重要規則】：照片中可能有多個手寫單號，請特別注意前方是否有「打勾 (V)」的記號。使用者已允許「複數單號命名」，如果有『多個打勾』的單號，請將它們全部提取出來，並使用底線 '_' 連接（例如：3410-123_3410-456）做為 orderNumber。若都沒有打勾，則把所有單號用底線連接。"
+          : "【重要規則】：照片中可能有多個手寫單號，請特別注意前方是否有「打勾 (V)」的記號。如果有打勾，請【絕對優先】選擇有打勾的單號。即使有多個打勾的單號，也請只選擇最明確的【一個】做為 orderNumber。";
+
         const payload = {
           contents: [
             {
               parts: [
                 {
-                  text: "這是一張報價單/出貨單的照片。請找出該單據的「公司或工廠名稱」以及開頭為 '3310-' 或 '3410-' 的連續數字單號（例如 3310-20260...）。請嚴格以 JSON 格式回傳，必須包含 'company' 和 'orderNumber' 兩個字串欄位。如果找不到公司名稱，請填入 '未知公司'；如果找不到單號，orderNumber 請填入 'NOT_FOUND'。"
+                  text: `這是一張報價單/出貨單的照片。請找出該單據的「公司或工廠名稱」以及開頭為 '3310-' 或 '3410-' 的連續數字單號。\n${promptInstruction}\n請嚴格以 JSON 格式回傳，必須包含 'company' 和 'orderNumber' 兩個字串欄位。如果找不到公司名稱，請填入 '未知公司'；如果找不到單號，orderNumber 請填入 'NOT_FOUND'。`
                 },
                 {
                   inlineData: {
@@ -1751,13 +1761,18 @@
         console.log(`[解析結果] 公司: ${rawCompany}, 淨化後單號: ${cleanOrder}`);
         addConsoleLine(`[API] 成功解析回傳 (公司: ${rawCompany})，防呆單號已印至 F12 Console。`, 'system');
 
-        // 4. 使用正則表達式擷取單號：/(3310|3410)-([A-Za-z0-9]+)/
+        // 4. 使用正則表達式擷取單號：/(3310|3410)-([A-Za-z0-9]+)/g (全域比對)
         // 放寬後方配對以相容可能夾雜的英文代號
-        const regex = /(3310|3410)-([A-Za-z0-9]+)/;
-        const match = cleanOrder.match(regex);
+        const regex = /(3310|3410)-([A-Za-z0-9]+)/g;
+        const matches = [...cleanOrder.matchAll(regex)];
 
-        if (cleanOrder !== 'NOT_FOUND' && match) {
-          const targetCode = match[0];
+        if (cleanOrder !== 'NOT_FOUND' && matches.length > 0) {
+          // 根據複數勾選狀態決定擷取邏輯
+          const allowMultiple = document.getElementById('allowMultipleOrders').checked;
+          const targetCode = allowMultiple 
+            ? matches.map(m => m[0]).join('_') 
+            : matches[0][0]; // 未勾選則強制只取第一個
+            
           item.ocrResult = targetCode;
           item.company = rawCompany;
           
