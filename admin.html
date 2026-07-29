@@ -1092,7 +1092,51 @@ function hideAchievements() {
             </div>
           </div>
         </div>
-        
+        <!-- 成就 9 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">九、前台多行排版與無縫更新</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 前台顯示需依照後台編輯的換行與排版格式呈現。<br>
+                • 使用者需能不重新整理頁面即可獲取最新發布內容。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>前台支援 <code>whitespace-pre-wrap</code>，保留編輯空格與換行。新增「更新」按鈕並結合資料庫即時同步機制，一鍵無縫載入最新公告。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 10 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十、撤回發布功能與富文本編輯器整合</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 支援將已發布的內容「撤回」或「取消發布」。<br>
+                • 後台公告編輯支援文字格式化 (粗斜體、底線、字體大小、顏色)。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>管理列新增直覺的「撤回發布」按鈕，快速將公告退為草稿。段落編輯區成功導入 <code>Quill.js</code> 富文本編輯器，並讓前台同步完美渲染 HTML 內容，大大提升公告質感。
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
