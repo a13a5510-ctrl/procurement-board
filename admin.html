@@ -75,6 +75,33 @@
     #lo{position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;}
     .spn{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;}
     @keyframes sp{to{transform:rotate(360deg)}}
+    
+    /* 讓 Quill 工具列改為靠左側的垂直排列，節省畫面空間 */
+    .ql-toolbar.ql-snow {
+      border: 1px solid #e2e8f0 !important;
+      border-right: none !important;
+      border-radius: 4px 0 0 4px;
+      background: #f8fafc;
+      padding: 4px !important;
+      display: flex;
+      flex-direction: column;
+      width: 36px;
+    }
+    .ql-toolbar.ql-snow .ql-formats {
+      margin: 0 0 4px 0 !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ql-toolbar.ql-snow button {
+      margin: 0 !important;
+      width: 24px !important;
+      height: 24px !important;
+    }
+    .ql-container.ql-snow {
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0 4px 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -123,6 +150,9 @@
       </button>
       <button onclick="showKM()" class="btn-s w-full justify-center text-sm text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 mt-2">
         <span class="font-bold tracking-wide">📚 關鍵字資料庫維護</span>
+      </button>
+      <button onclick="showWL()" class="btn-s w-full justify-center text-sm text-cyan-600 border-cyan-200 bg-cyan-50 hover:bg-cyan-100 mt-2">
+        <span class="font-bold tracking-wide">✉️ 郵件白名單管理</span>
       </button>
       <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
@@ -1231,5 +1261,139 @@ function hideAchievements() {
       } catch(e) { toast('儲存失敗', 'er'); }
     }
   </script>
+<!-- 郵件白名單 Modal -->
+<div id="wl-modal" class="hidden fixed inset-0 z-[110] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[80vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">✉️ 郵件白名單管理</h3>
+      <button onclick="hideWL()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-4 border-b border-slate-100 flex gap-2">
+      <input type="text" id="wl-name" placeholder="姓名 (例: 吳俊緯)" class="form-input flex-1">
+      <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-1">
+      <button onclick="addWL()" class="btn-p">新增</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 bg-slate-50/30" id="wl-list"></div>
+  </div>
+</div>
+
+<!-- 發送郵件確認 Modal -->
+<div id="pub-modal" class="hidden fixed inset-0 z-[120] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col m-4">
+    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 rounded-t-2xl flex justify-between items-center">
+      <div>
+        <h3 class="text-lg font-bold text-slate-800">✅ 選擇發送對象</h3>
+        <p class="text-xs text-slate-500 mt-1">請勾選要收到此週報通知信的人員</p>
+      </div>
+      <button onclick="hidePubModal()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-4 py-2 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-blue-800">
+            <input type="checkbox" id="pub-wl-all" class="rounded text-blue-600" checked onchange="toggleAllWL(this.checked)"> 全選 / 取消全選
+        </label>
+    </div>
+    <div class="p-4 max-h-[50vh] overflow-y-auto grid grid-cols-2 gap-3" id="pub-wl-list"></div>
+    <div class="p-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50 rounded-b-2xl">
+      <button onclick="hidePubModal()" class="btn-s">取消</button>
+      <button onclick="confirmPubBulletin()" class="btn-p" id="btn-pub-confirm">確認發布並寄信</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let tempWL = [];
+const DEFAULT_WL = "JunWei Wu 吳俊緯 <JunWeiWu@youbike.com.tw>; Jiyu Gu 顧致宇 <JiyuGu@youbike.com.tw>; Lucas Wang 王文樺 <LucasWang@youbike.com.tw>; Mars Lin 林瑋泰 <MarsLin@youbike.com.tw>; George Chen 陳俊帆 <GeorgeChen@youbike.com.tw>; Sherry Lu 呂淑意 <SherryLu@youbike.com.tw>; Jane Chuang 莊佳誼 <JaneChuang@youbike.com.tw>; Beichen Ren 任北辰 <BeichenRen@youbike.com.tw>; Ruby Chen 陳恩柔 <RubyChen2@youbike.com.tw>; Wei Wan 萬偉 <WeiWan@youbike.com.tw>; Sinan Lin 林信安 <SinanLin@youbike.com.tw>; Tank Lin 林育民 <TankLin@youbike.com.tw>; Clon Huang 黃龍輝 <ClonHuang@youbike.com.tw>; HsuWei Chu 朱栩葳 <HsuWeiChu@youbike.com.tw>; XinRay Hung 洪訢睿 <XinRayHung@youbike.com.tw>; Shuni NI 倪順一 <ShuniNI@youbike.com.tw>; Chiahsiu Li 李嘉修 <ChiahsiuLi@youbike.com.tw>; Boa Chen 陳漢全 <BoaChen@youbike.com.tw>; YiMin Chiu 邱宜敏 <YiMinChiu@youbike.com.tw>; Bruce Lin 林渝軒 <BruceLin@youbike.com.tw>; RuXuan Zhang 張挐瑄 <RuXuanZhang@youbike.com.tw>; Cola Wu 吳建穎 <ColaWu@youbike.com.tw>; JianDe Liu 劉建德 <JianDeLiu@youbike.com.tw>; Sam Huang 黃聖育 <SamHuang@youbike.com.tw>; ZihYue Li 李子岳 <ZihYueLi@youbike.com.tw>; Zoey Lin 林言柔 <ZoeyLin@youbike.com.tw>; ShuChi Lu 呂淑綺 <ShuChiLu@youbike.com.tw>; Colin Tang 唐仕伀 <ColinTang@youbike.com.tw>; Hanley Fu 傅涵立 <HanleyFu@youbike.com.tw>; Ringka Huang 黃仁瑱 <RingkaHuang@youbike.com.tw>; Kevin Chang 張浩 <KevinChang@youbike.com.tw>; Aidpan Chen 陳麒任 <AidpanChen@youbike.com.tw>; Jerry Hsu 徐嘉鴻 <JHsu@youbike.com.tw>; Wendy Lu 盧瑞云 <WendyLu@youbike.com.tw>; Ruowei Wang 王若維 <RuoweiWang@youbike.com.tw>; Yun Chen 陳韻欣 <YunChen@youbike.com.tw>; Ryan Peng 彭上維 <RyanPeng@youbike.com.tw>; Michael Chien 簡榮德 <MichaelChien@youbike.com.tw>; Hank Tsai 蔡瀚緯 <HankTsai@youbike.com.tw>; MingXiao Lin 林明孝 <MingXiaoLin@youbike.com.tw>; Chenlong Pai 白正隆 <ChenlongPai@youbike.com.tw>; QiZhong Huang 黃啟中 <QiZhongHuang@youbike.com.tw>".split('; ').map(s => {
+  const m = s.match(/(.+)\s<(.+)>/);
+  return m ? { name: m[1].trim(), email: m[2].trim() } : null;
+}).filter(Boolean);
+
+async function initWL() {
+  let saved = localStorage.getItem('youbike_wl');
+  if (saved) { tempWL = JSON.parse(saved); }
+  else { tempWL = [...DEFAULT_WL]; saveWL(); }
+}
+function saveWL() { localStorage.setItem('youbike_wl', JSON.stringify(tempWL)); }
+function showWL() { initWL(); document.getElementById('wl-modal').classList.remove('hidden'); renderWL(); }
+function hideWL() { document.getElementById('wl-modal').classList.add('hidden'); }
+function addWL() {
+  const n = document.getElementById('wl-name').value.trim();
+  const e = document.getElementById('wl-email').value.trim();
+  if(!n || !e) return toast('姓名與信箱必填', 'er');
+  tempWL.push({name: n, email: e}); saveWL(); renderWL();
+  document.getElementById('wl-name').value=''; document.getElementById('wl-email').value='';
+  toast('已新增至白名單', 'ok');
+}
+function rmWL(idx) { 
+  if(!confirm(`確定要刪除 ${tempWL[idx].name} 嗎？`)) return;
+  tempWL.splice(idx, 1); saveWL(); renderWL(); 
+}
+function renderWL() {
+  const c = document.getElementById('wl-list');
+  c.innerHTML = tempWL.map((w, i) => `
+    <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200">
+      <div>
+        <div class="font-medium text-slate-800 text-sm">${w.name}</div>
+        <div class="text-xs text-slate-500">${w.email}</div>
+      </div>
+      <button onclick="rmWL(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+    </div>
+  `).join('');
+}
+
+// Override original pubBulletin to show modal instead
+async function pubBulletin() {
+  if(!S.cur) return;
+  initWL();
+  document.getElementById('pub-modal').classList.remove('hidden');
+  document.getElementById('pub-wl-all').checked = true;
+  const c = document.getElementById('pub-wl-list');
+  c.innerHTML = tempWL.map((w, i) => `
+    <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer border border-slate-100 transition-colors">
+      <input type="checkbox" class="pub-wl-cb w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" value="${w.email}" checked>
+      <div class="flex flex-col"><span class="text-sm font-semibold text-slate-700">${w.name}</span><span class="text-xs text-slate-400 mt-0.5">${w.email}</span></div>
+    </label>
+  `).join('');
+}
+function hidePubModal() { document.getElementById('pub-modal').classList.add('hidden'); }
+function toggleAllWL(checked) {
+  document.querySelectorAll('.pub-wl-cb').forEach(cb => cb.checked = checked);
+}
+
+async function confirmPubBulletin() {
+  if(!S.cur) return;
+  const cbs = document.querySelectorAll('.pub-wl-cb:checked');
+  const selectedEmails = Array.from(cbs).map(cb => cb.value);
+  if (selectedEmails.length === 0 && !confirm('您沒有勾選任何收件人，確定要繼續發布且不寄出通知信嗎？')) return;
+  
+  fc(); 
+  const btn=document.getElementById('btn-pub-confirm');
+  btn.disabled=true; btn.textContent='發布中...';
+  try {
+    const d={...S.cur, status:'published', feedbackLog:S.fbs};
+    await DS.save(d.id,d);
+    
+    // 自訂發送名單
+    if (selectedEmails.length > 0 && typeof emailjs !== 'undefined') {
+      const toList = selectedEmails.join(',');
+      await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
+        to_email: toList,
+        subject: '【採購週報上線】' + d.title,
+        message: '新版採購週報已上線，請點擊連結查看。',
+        link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id
+      });
+    }
+    
+    S.dirty=false;
+    const sb=document.getElementById('tb-status'); sb.className='bdg-pub'; sb.textContent='已發布';
+    document.getElementById('btn-unpub').classList.remove('hidden');
+    document.getElementById('btn-pub').classList.add('hidden');
+    toast('🎉 週報已正式發布並寄出通知信！', 'ok');
+    S.mmap = await DS.getMonths();
+    renderSB();
+    hidePubModal();
+  } catch(e) { toast('發布失敗：'+e.message,'er'); } 
+  finally { btn.disabled=false; btn.textContent='確認發布並寄信'; }
+}
+</script>
 </body>
 </html>
