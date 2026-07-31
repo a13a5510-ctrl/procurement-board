@@ -76,31 +76,34 @@
     .spn{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;}
     @keyframes sp{to{transform:rotate(360deg)}}
     
-    /* 讓 Quill 工具列改為靠左側的垂直排列，節省畫面空間 */
+    /* 讓 Quill 工具列整合至頂部 B 段落標題列 */
     .ql-toolbar.ql-snow {
-      border: 1px solid #e2e8f0 !important;
-      border-right: none !important;
-      border-radius: 4px 0 0 4px;
-      background: #f8fafc;
-      padding: 4px !important;
+      border: none !important;
+      background: transparent;
+      padding: 0 !important;
       display: flex;
-      flex-direction: column;
-      width: 36px;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: nowrap;
     }
     .ql-toolbar.ql-snow .ql-formats {
-      margin: 0 0 4px 0 !important;
+      margin: 0 8px 0 0 !important;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
     }
-    .ql-toolbar.ql-snow button {
-      margin: 0 !important;
-      width: 24px !important;
-      height: 24px !important;
+    .ql-toolbar.ql-snow .ql-formats:last-child {
+      margin-right: 0 !important;
     }
     .ql-container.ql-snow {
       border: 1px solid #e2e8f0 !important;
-      border-radius: 0 4px 4px 0;
+      border-radius: 4px;
+      min-height: 56px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ql-container.ql-snow:focus-within {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
     }
   </style>
 </head>
@@ -153,6 +156,9 @@
       </button>
       <button onclick="showWL()" class="btn-s w-full justify-center text-sm text-cyan-600 border-cyan-200 bg-cyan-50 hover:bg-cyan-100 mt-2">
         <span class="font-bold tracking-wide">✉️ 郵件白名單管理</span>
+      </button>
+      <button onclick="showGuide()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 mt-2">
+        <span class="font-bold tracking-wide">💡 系統操作指南</span>
       </button>
       <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
@@ -236,8 +242,12 @@
           </div>
         </section>
         <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
+            <div class="flex items-center gap-4">
+              <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
+              <div class="text-xs text-slate-400 font-medium" id="toolbar-hint">✨ 點擊下方文字框啟用編輯工具</div>
+              <div id="toolbar-portal" class="flex items-center"></div>
+            </div>
             <button onclick="showModal()" class="btn-s text-xs py-1.5 px-3">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增段落
             </button>
@@ -851,7 +861,7 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
 const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
 const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
 const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
@@ -1394,6 +1404,66 @@ async function confirmPubBulletin() {
   } catch(e) { toast('發布失敗：'+e.message,'er'); } 
   finally { btn.disabled=false; btn.textContent='確認發布並寄信'; }
 }
+
+function showGuide() {
+  document.getElementById('guide-modal').classList.remove('hidden');
+}
+function hideGuide() {
+  document.getElementById('guide-modal').classList.add('hidden');
+}
+
 </script>
+<!-- System Guide Modal -->
+<div id="guide-modal" class="hidden fixed inset-0 z-[200] flex justify-center bg-slate-900/50 backdrop-blur-sm transition-all duration-300" style="align-items: center;">
+  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[85vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-2xl">
+      <h3 class="text-xl font-bold text-amber-800 flex items-center gap-2">💡 採購週報系統：新手操作指南</h3>
+      <button onclick="hideGuide()" class="text-amber-600 hover:bg-amber-100 p-1.5 rounded-lg transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-6 overflow-y-auto space-y-6 text-slate-700 bg-slate-50/30">
+      
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>發布錯誤沒關係，一鍵撤回與重發</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">發現公告有錯字或少傳附件？點擊右上角「撤回發布」，週報就會立刻從前台下架，變成草稿狀態。</p>
+        <p class="text-sm leading-relaxed text-slate-600">修正完畢後再次點選「正式發布」，系統會彈出名單，讓您重新勾選要額外通知的人員，不怕漏發更新版本給長官！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">2</span>嚴密的安全防護與精準通知</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台防護：</strong>只有使用 <code class="bg-slate-100 px-1 py-0.5 rounded text-red-500">@youbike.com.tw</code> 信箱的同仁才能登入前台閱讀週報，保護機密不外洩。</p>
+        <p class="text-sm leading-relaxed text-slate-600"><strong>後台白名單：</strong>後台內建了「郵件白名單管理」，您可以自由維護常設的通知名單。發布週報時，可以像點餐一樣輕鬆勾選這次要特別通知誰。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">3</span>免安裝、點開即用的雲端系統</h4>
+        <p class="text-sm leading-relaxed text-slate-600">不用複雜的安裝步驟，只要雙擊檔案就能開啟。所有的週報資料都會自動存入最高級別的 Firebase 雲端資料庫，隨寫隨存，資料安全不遺失。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">4</span>乾淨俐落的編輯畫面</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">為了讓您有最大的打字空間，我們把文字工具列（粗體、顏色等）藏了起來。</p>
+        <p class="text-sm leading-relaxed text-slate-600">只要您 <strong>點擊任何一個段落的文字框</strong>，工具列就會聰明地出現在「B 段落內容管理」的標題列上方，既不佔空間又好用！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">5</span>豐富的專屬業務表格</h4>
+        <p class="text-sm leading-relaxed text-slate-600">除了打字，您還可以點擊每個段落右側的「📊 表格」按鈕，快速插入「漲價料件清單」、「修繕紀錄」等採購專屬表格，資料填寫更結構化。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">6</span>誰看過週報？一目了然</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">系統會自動記錄哪些長官或同仁已經點開閱讀過這份週報，您可以在 C 區塊即時追蹤。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您還可以在右側的「回饋與待辦」區塊，為每篇週報記下需要追蹤的事項，打勾就代表完成！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">7</span>統一用語，分類更輕鬆</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">系統內建了標準的「8 大管理分類」與對應的子標題。當您選擇主分類後，點擊旁邊的子標題欄位，系統會自動推薦關鍵字，省去手動打字的麻煩。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您可以隨時在左側的「📚 關鍵字資料庫維護」中，依照現況新增、修改或停用這些分類選項。</p>
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
